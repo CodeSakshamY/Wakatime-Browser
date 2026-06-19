@@ -538,7 +538,7 @@ class EasyEDATracker:
         self._last_easyeda_seen = now
 
         # Try to get real project name from DOM first, fall back to title parse
-        project = get_project_name_from_dom(self.browser, "")
+        project = "EasyEDA-PCB"
         if not project:
             project = extract_project_from_title(state.title, self.default_project)
         if not project:
