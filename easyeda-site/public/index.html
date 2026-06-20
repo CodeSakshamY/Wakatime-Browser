@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EasyEDA → Hackatime Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:          #FAFAF8;
+      --bg-raised:   #F4F3EF;
+      --bg-sunken:   #ECEAE4;
+      --border:      #D9D7D0;
+      --border-mid:  #C4C2BA;
+      --text:        #1A1A18;
+      --text-2:      #5C5B55;
+      --text-3:      #9E9C93;
+      --ink:         #1E3A5F;
+      --ink-light:   #2E5080;
+      --green:       #16A34A;
+      --green-bg:    #DCFCE7;
+      --amber:       #D97706;
+      --amber-bg:    #FEF3C7;
+      --red:         #DC2626;
+      --red-bg:      #FEE2E2;
+      --term-bg:     #111210;
+      --term-text:   #D4D0C4;
+      --term-green:  #4EC44E;
+      --term-blue:   #6EB4FF;
+      --term-yellow: #F5C842;
+      --term-dim:    #5C5B55;
+      --radius:      6px;
+      --radius-lg:   10px;
+      --shadow:      0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
+      --shadow-lg:   0 4px 20px rgba(0,0,0,.10);
+    }
+
+    [data-theme="dark"] {
+      --bg:          #0F1117;
+      --bg-raised:   #171B24;
+      --bg-sunken:   #1E2330;
+      --border:      #2A3040;
+      --border-mid:  #3A4255;
+      --text:        #E8E6E0;
+      --text-2:      #9C9A94;
+      --text-3:      #5C5B55;
+      --ink:         #6EB4FF;
+      --ink-light:   #94C8FF;
+      --green:       #4ADE80;
+      --green-bg:    #052E16;
+      --amber:       #FCD34D;
+      --amber-bg:    #292400;
+      --red:         #F87171;
+      --red-bg:      #2D0A0A;
+      --term-bg:     #0A0C0F;
+      --term-text:   #D4D0C4;
+      --shadow:      0 1px 3px rgba(0,0,0,.25), 0 4px 12px rgba(0,0,0,.20);
+      --shadow-lg:   0 4px 20px rgba(0,0,0,.40);
+    }
+
+    /* ── RESET ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+      transition: background .2s, color .2s;
+    }
+    ::selection { background: var(--ink); color: #fff; }
+
+    /* ── LAYOUT ─────────────────────────────────────────── */
+    .container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── NAV ────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      backdrop-filter: blur(8px);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 780px; margin: 0 auto; padding: 0 24px;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600; font-size: 13px; color: var(--text);
+      text-decoration: none;
+    }
+    .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .theme-btn {
+      background: none; border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--text-2); cursor: pointer; padding: 6px 10px;
+      font-size: 13px; transition: all .15s;
+    }
+    .theme-btn:hover { border-color: var(--border-mid); color: var(--text); }
+    .nav-link {
+      font-size: 13px; color: var(--text-2); text-decoration: none;
+      transition: color .15s;
+    }
+    .nav-link:hover { color: var(--text); }
+
+    /* ── HERO ───────────────────────────────────────────── */
+    .hero {
+      padding: 80px 0 60px;
+      border-bottom: 1px solid var(--border);
+    }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 500; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-3);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 600; line-height: 1.15;
+      letter-spacing: -.02em; color: var(--text);
+      margin-bottom: 16px;
+    }
+    .hero h1 em { font-style: normal; color: var(--green); }
+    .hero .lead {
+      font-size: 16px; color: var(--text-2); max-width: 520px;
+      line-height: 1.7; margin-bottom: 36px;
+    }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 18px; border-radius: var(--radius);
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      border: none; text-decoration: none; transition: all .15s;
+    }
+    .btn-primary {
+      background: var(--ink); color: #fff;
+    }
+    .btn-primary:hover { opacity: .88; }
+    [data-theme="dark"] .btn-primary { background: var(--ink-light); color: #0F1117; }
+    .btn-outline {
+      background: transparent; color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--border-mid); color: var(--text); }
+
+    /* ── TERMINAL DEMO ──────────────────────────────────── */
+    .term-wrap {
+      margin-top: 48px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .term-header {
+      background: var(--bg-sunken);
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-dot.red   { background: #FF5F57; }
+    .term-dot.amber { background: #FFBD2E; }
+    .term-dot.green { background: #28CA41; }
+    .term-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-3);
+      margin-left: auto; margin-right: auto;
+      padding-right: 50px;
+    }
+    .term-body {
+      background: var(--term-bg);
+      padding: 18px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.8;
+      min-height: 140px;
+    }
+    .t-g  { color: var(--term-green); }
+    .t-b  { color: var(--term-blue); }
+    .t-y  { color: var(--term-yellow); }
+    .t-d  { color: var(--term-dim); }
+    .t-w  { color: var(--term-text); }
+    .cursor {
+      display: inline-block; width: 7px; height: 13px;
+      background: var(--term-green); vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── SECTION SHELLS ─────────────────────────────────── */
+    section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+    section:last-of-type { border-bottom: none; }
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 500; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-3);
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 22px; font-weight: 600;
+      letter-spacing: -.015em; color: var(--text);
+      margin-bottom: 6px;
+    }
+    .section-desc { font-size: 14px; color: var(--text-2); margin-bottom: 32px; }
+
+    /* ── CONFIG FORM ────────────────────────────────────── */
+    .form-grid { display: grid; gap: 20px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 12px; font-weight: 500; color: var(--text-2);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .field input, .field select {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px 12px;
+      font-size: 14px; font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+      outline: none; transition: border-color .15s;
+      width: 100%;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--ink);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--ink) 15%, transparent);
+    }
+    .field select { appearance: none; cursor: pointer; }
+    .field-hint { font-size: 11.5px; color: var(--text-3); }
+    .field-hint a { color: var(--ink); text-decoration: none; }
+    .field-hint a:hover { text-decoration: underline; }
+
+    /* API key reveal toggle */
+    .input-wrap { position: relative; }
+    .input-wrap input { padding-right: 44px; }
+    .reveal-btn {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--text-3); font-size: 12px; padding: 4px;
+      transition: color .15s;
+    }
+    .reveal-btn:hover { color: var(--text-2); }
+
+    /* ── INI PREVIEW ────────────────────────────────────── */
+    .ini-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 28px;
+    }
+    .ini-header {
+      background: var(--bg-raised);
+      padding: 10px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .ini-filename {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text-2);
+    }
+    .copy-btn {
+      font-size: 12px; padding: 4px 10px; border-radius: 4px;
+      border: 1px solid var(--border); background: var(--bg);
+      color: var(--text-2); cursor: pointer; transition: all .15s;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .copy-btn:hover { border-color: var(--border-mid); color: var(--text); }
+    .copy-btn.copied { color: var(--green); border-color: var(--green); }
+    pre.ini-code {
+      background: var(--bg-sunken);
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.75;
+      white-space: pre;
+      overflow-x: auto;
+      color: var(--text);
+      margin: 0;
+    }
+    .ini-key   { color: var(--ink); }
+    .ini-val   { color: var(--green); }
+    .ini-comment { color: var(--text-3); }
+    .ini-section { color: var(--amber); font-weight: 600; }
+
+    /* ── DOWNLOAD ────────────────────────────────────────── */
+    .download-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .download-card-header {
+      background: var(--bg-raised);
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .download-card-title {
+      font-size: 14px; font-weight: 600; color: var(--text);
+    }
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px; font-weight: 500;
+      padding: 2px 8px; border-radius: 99px;
+      background: var(--bg-sunken); color: var(--text-3);
+      border: 1px solid var(--border);
+    }
+    .file-list { padding: 0; list-style: none; }
+    .file-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .file-item:last-child { border-bottom: none; }
+    .file-icon { color: var(--text-3); font-size: 14px; width: 16px; text-align: center; }
+    .file-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px; color: var(--text); flex: 1;
+    }
+    .file-desc { font-size: 12px; color: var(--text-3); }
+    .file-dl {
+      font-size: 12px; color: var(--ink); text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 8px; border-radius: 4px;
+      border: 1px solid var(--border);
+      transition: all .15s;
+    }
+    .file-dl:hover { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent); }
+
+    .dl-all-btn {
+      width: 100%; padding: 12px;
+      background: var(--ink); color: #fff;
+      border: none; border-radius: var(--radius);
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: opacity .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .dl-all-btn:hover { opacity: .88; }
+    [data-theme="dark"] .dl-all-btn { background: var(--ink-light); color: #0F1117; }
+
+    /* ── COMMANDS ────────────────────────────────────────── */
+    .steps-list { display: flex; flex-direction: column; gap: 24px; }
+    .step {
+      display: grid; grid-template-columns: 28px 1fr;
+      gap: 14px; align-items: start;
+    }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      font-size: 11px; font-weight: 600; color: var(--text-2);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .step-content {}
+    .step-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .step-desc { font-size: 13px; color: var(--text-2); margin-bottom: 10px; }
+    .cmd-block {
+      background: var(--term-bg);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      display: flex; align-items: flex-start; gap: 10px;
+      border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+    }
+    .cmd-prompt { color: var(--term-dim); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; flex-shrink: 0; margin-top: 1px; }
+    .cmd-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px; color: var(--term-text);
+      line-height: 1.6; flex: 1; word-break: break-all;
+    }
+    .cmd-copy {
+      background: none; border: none; cursor: pointer;
+      color: var(--term-dim); font-size: 12px;
+      padding: 2px 4px; border-radius: 3px;
+      transition: color .15s; flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .cmd-copy:hover { color: var(--term-green); }
+    .cmd-copy.copied { color: var(--term-green); }
+    .cmd-var { color: var(--term-yellow); }
+
+    /* ── ALERT ───────────────────────────────────────────── */
+    .alert {
+      border-radius: var(--radius);
+      padding: 12px 16px; font-size: 13px;
+      display: flex; gap: 10px; align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .alert-warn { background: var(--amber-bg); color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber) 25%, transparent); }
+    .alert-info { background: var(--green-bg); color: var(--green); border: 1px solid color-mix(in srgb, var(--green) 25%, transparent); }
+    .alert-icon { flex-shrink: 0; margin-top: 1px; }
+    .alert-body { color: var(--text); }
+    .alert-body strong { font-weight: 600; }
+
+    /* ── VERIFY ──────────────────────────────────────────── */
+    .log-sample {
+      background: var(--term-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; line-height: 1.85;
+      border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-text { font-size: 12px; color: var(--text-3); }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a {
+      font-size: 12px; color: var(--text-3); text-decoration: none;
+      transition: color .15s;
+    }
+    .footer-links a:hover { color: var(--text-2); }
+
+    /* ── MISC ────────────────────────────────────────────── */
+    .divider {
+      height: 1px; background: var(--border); margin: 32px 0;
+    }
+    a { color: var(--ink); }
+    code {
+      font-family: 'JetBrains Mono', monospace; font-size: .85em;
+      background: var(--bg-sunken); padding: 1px 5px;
+      border-radius: 3px; color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* no-JS warning */
+    .no-js-warn {
+      background: var(--amber-bg); border: 1px solid var(--amber);
+      border-radius: var(--radius); padding: 10px 14px;
+      font-size: 13px; color: var(--amber); margin-bottom: 20px;
+      display: none;
+    }
+
+    @media (max-width: 560px) {
+      .hero { padding: 48px 0 40px; }
+      section { padding: 40px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">
+      <span class="brand-dot"></span>
+      easyeda-tracker
+    </a>
+    <div class="nav-actions">
+      <a class="nav-link" href="#configure">Configure</a>
+      <a class="nav-link" href="#download">Download</a>
+      <a class="nav-link" href="#install">Install</a>
+      <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">🌙 Dark</button>
+    </div>
+  </div>
+</nav>
+
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <p class="eyebrow">macOS · Python · WakaTime-compatible</p>
+    <h1>Track EasyEDA time<br>in <em>Hackatime</em></h1>
+    <p class="lead">
+      A lightweight background tracker that detects when you're working in EasyEDA
+      and sends heartbeats to Hackatime. Configure below, download the files, and
+      you're running in under five minutes.
+    </p>
+    <div class="hero-actions">
+      <a href="#configure" class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Configure &amp; Download
+      </a>
+      <a href="https://hackatime.hackclub.com" target="_blank" rel="noopener" class="btn btn-outline">
+        Hackatime →
+      </a>
+    </div>
+
+    <!-- Terminal demo -->
+    <div class="term-wrap">
+      <div class="term-header">
+        <span class="term-dot red"></span>
+        <span class="term-dot amber"></span>
+        <span class="term-dot green"></span>
+        <span class="term-title">~/.easyeda_tracker.log</span>
+      </div>
+      <div class="term-body" id="termDemo">
+        <div><span class="t-d">2025-06-19 14:31:58</span> <span class="t-b">[INFO]</span> <span class="t-w">Starting EasyEDA Hackatime Tracker v1.0.0</span></div>
+        <div id="termLine2" style="opacity:0"><span class="t-d">2025-06-19 14:32:03</span> <span class="t-g">[OK]</span>&nbsp;&nbsp; <span class="t-w">✓ Connected to Hackatime as user: <span class="t-y" id="termUser">yourname</span></span></div>
+        <div id="termLine3" style="opacity:0"><span class="t-d">2025-06-19 14:32:08</span> <span class="t-b">[INFO]</span> <span class="t-w">⏺  EasyEDA detected in Safari — tab is focused</span></div>
+        <div id="termLine4" style="opacity:0"><span class="t-d">2025-06-19 14:32:08</span> <span class="t-b">[INFO]</span> <span class="t-w">⏺  Queued heartbeat | project=<span class="t-g">'<span id="termProject">EasyEDA PCB Design</span>'</span></span></div>
+        <div id="termLine5" style="opacity:0"><span class="t-d">2025-06-19 14:32:38</span> <span class="t-g">[OK]</span>&nbsp;&nbsp; <span class="t-w">✓ Sent 2 heartbeat(s) — HTTP 201</span></div>
+        <div id="termCursor"><span class="cursor"></span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- SECTION 1: CONFIGURE -->
+<section id="configure">
+  <div class="container">
+    <p class="section-label">Step 1</p>
+    <h2 class="section-title">Configure your tracker</h2>
+    <p class="section-desc">Fill in your settings. The config file and install commands below update as you type.</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="apiKey">HACKATIME_API_KEY</label>
+        <div class="input-wrap">
+          <input type="password" id="apiKey" placeholder="32d7f043-3dae-4880-8e2f-2dca26149b6d" autocomplete="off" spellcheck="false" />
+          <button class="reveal-btn" id="revealBtn" aria-label="Show/hide API key">👁</button>
+        </div>
+        <span class="field-hint">
+          Get yours at <a href="https://hackatime.hackclub.com/my/settings" target="_blank">hackatime.hackclub.com/my/settings</a> → API Key section
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="browser">BROWSER</label>
+          <select id="browser">
+            <option value="Safari">Safari</option>
+            <option value="Chrome">Chrome</option>
+          </select>
+          <span class="field-hint">Which browser you use EasyEDA in</span>
+        </div>
+        <div class="field">
+          <label for="apiUrl">API_URL</label>
+          <select id="apiUrl">
+            <option value="https://hackatime.hackclub.com/api/hackatime/v1">Hackatime (Hack Club)</option>
+            <option value="https://wakatime.com/api/v1">WakaTime directly</option>
+            <option value="custom">Custom URL…</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="customUrlField" style="display:none">
+        <label for="customUrl">CUSTOM_API_URL</label>
+        <input type="text" id="customUrl" placeholder="https://your-instance.example.com/api/v1" />
+      </div>
+
+      <div class="field">
+        <label for="projectName">DEFAULT_PROJECT_NAME</label>
+        <input type="text" id="projectName" value="EasyEDA PCB Design" placeholder="EasyEDA PCB Design" />
+        <span class="field-hint">Shown in Hackatime when the page title can't be read. You can use your actual project name.</span>
+      </div>
+
+      <div class="field">
+        <label for="installDir">INSTALL_DIRECTORY</label>
+        <input type="text" id="installDir" value="~/tools/easyeda-tracker" placeholder="~/tools/easyeda-tracker" />
+        <span class="field-hint">Where you'll put the tracker files on your Mac. Don't move them after installing.</span>
+      </div>
+    </div>
+
+    <!-- INI Preview -->
+    <div class="ini-card" style="margin-top: 32px;">
+      <div class="ini-header">
+        <span class="ini-filename">~/.easyeda_tracker.ini</span>
+        <button class="copy-btn" id="copyIni">copy</button>
+      </div>
+      <pre class="ini-code" id="iniPreview"></pre>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- SECTION 2: DOWNLOAD -->
+<section id="download">
+  <div class="container">
+    <p class="section-label">Step 2</p>
+    <h2 class="section-title">Download the files</h2>
+    <p class="section-desc">Download all four files and put them in the folder you chose above. Keep them there permanently — the LaunchAgent points to this location.</p>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body"><strong>Don't move the files after installing.</strong> The LaunchAgent plist uses the absolute path you set. If you move the folder, you'll need to re-run the installer.</div>
+    </div>
+
+    <div class="download-card">
+      <div class="download-card-header">
+        <span class="download-card-title">Tracker files</span>
+        <span class="badge">4 files</span>
+      </div>
+      <ul class="file-list">
+        <li class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">easyeda_tracker.py</span>
+          <span class="file-desc">Main tracker script</span>
+          <a href="easyeda_tracker.py" download class="file-dl">↓</a>
+        </li>
+        <li class="file-item">
+          <span class="file-icon">⚙️</span>
+          <span class="file-name">install.sh</span>
+          <span class="file-desc">Installer script</span>
+          <a href="install.sh" download class="file-dl">↓</a>
+        </li>
+        <li class="file-item">
+          <span class="file-icon">📋</span>
+          <span class="file-name">com.easyeda.tracker.plist.template</span>
+          <span class="file-desc">LaunchAgent template</span>
+          <a href="com.easyeda.tracker.plist.template" download class="file-dl">↓</a>
+        </li>
+        <li class="file-item">
+          <span class="file-icon">📄</span>
+          <span class="file-name">README.md</span>
+          <span class="file-desc">Full documentation</span>
+          <a href="README.md" download class="file-dl">↓</a>
+        </li>
+      </ul>
+    </div>
+
+    <button class="dl-all-btn" id="dlAll">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download all files as a folder
+    </button>
+
+  </div>
+</section>
+
+
+<!-- SECTION 3: INSTALL -->
+<section id="install">
+  <div class="container">
+    <p class="section-label">Step 3</p>
+    <h2 class="section-title">Run in Terminal</h2>
+    <p class="section-desc">Open Terminal (⌘ Space → "Terminal") and run these commands in order.</p>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">ℹ️</span>
+      <div class="alert-body">Commands below use the install directory and API key you entered above. If you haven't filled them in yet, go back to Step 1.</div>
+    </div>
+
+    <div class="steps-list" id="stepsList">
+      <!-- Populated by JS -->
+    </div>
+
+  </div>
+</section>
+
+
+<!-- SECTION 4: PERMISSIONS -->
+<section id="permissions">
+  <div class="container">
+    <p class="section-label">Step 4</p>
+    <h2 class="section-title">Grant macOS permissions</h2>
+    <p class="section-desc">The tracker reads your browser tab using AppleScript. macOS blocks this by default.</p>
+
+    <div class="steps-list">
+      <div class="step">
+        <div class="step-num">A</div>
+        <div class="step-content">
+          <div class="step-title">Allow Terminal to control Safari</div>
+          <div class="step-desc">The first time the tracker runs, a system dialog will appear. Click <strong>OK</strong>.<br>
+          If no dialog appears: <strong>System Settings → Privacy &amp; Security → Automation → Terminal → Safari ✓</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">B</div>
+        <div class="step-content">
+          <div class="step-title">Enable Safari developer features (for project name detection)</div>
+          <div class="step-desc">Without this, all your EasyEDA time shows under one project name instead of per-board.<br>
+          <strong>Safari → Settings (⌘,) → Advanced → ✓ Show features for web developers</strong></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- SECTION 5: VERIFY -->
+<section id="verify">
+  <div class="container">
+    <p class="section-label">Step 5</p>
+    <h2 class="section-title">Verify it's working</h2>
+    <p class="section-desc">Open EasyEDA in Safari, work on a project for a minute, then check your logs.</p>
+
+    <div class="step" style="margin-bottom: 24px;">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Watch the log in real time</div>
+        <div class="cmd-block">
+          <span class="cmd-prompt">$</span>
+          <span class="cmd-text">tail -f ~/.easyeda_tracker.log</span>
+          <button class="cmd-copy" data-cmd="tail -f ~/.easyeda_tracker.log">copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="log-sample">
+      <div><span class="t-d">2025-06-19 14:32:05</span> <span class="t-g">[INFO]</span> <span class="t-w">✓ Connected to Hackatime as user: yourname</span></div>
+      <div><span class="t-d">2025-06-19 14:32:10</span> <span class="t-b">[INFO]</span> <span class="t-w">⏺  EasyEDA detected in Safari — tab is focused</span></div>
+      <div><span class="t-d">2025-06-19 14:32:10</span> <span class="t-b">[INFO]</span> <span class="t-w">⏺  Queued heartbeat | project=<span class="t-g">'My PCB Board'</span> | entity=<span class="t-b">'easyeda://My PCB Board'</span></span></div>
+      <div><span class="t-d">2025-06-19 14:32:40</span> <span class="t-g">[INFO]</span> <span class="t-w">✓ Sent 2 heartbeat(s) successfully (HTTP 201)</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="steps-list">
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Test your connection manually</div>
+          <div id="testConnCmd" class="cmd-block">
+            <span class="cmd-prompt">$</span>
+            <span class="cmd-text" id="testConnText">python3 ~/tools/easyeda-tracker/easyeda_tracker.py --test-connection</span>
+            <button class="cmd-copy" id="testConnCopy">copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Check Hackatime dashboard</div>
+          <div class="step-desc">Activity appears within 2–5 minutes of working in EasyEDA. Go to <a href="https://hackatime.hackclub.com" target="_blank">hackatime.hackclub.com</a> and look for EasyEDA in your activity.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="section-label" style="margin-bottom:12px">Useful commands</p>
+    <div class="steps-list" id="usefulCmds">
+      <!-- Populated by JS -->
+    </div>
+
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <span class="footer-text">EasyEDA → Hackatime Tracker · macOS · v1.0.0</span>
+      <div class="footer-links">
+        <a href="https://hackatime.hackclub.com" target="_blank" rel="noopener">Hackatime</a>
+        <a href="https://easyeda.com" target="_blank" rel="noopener">EasyEDA</a>
+        <a href="README.md" target="_blank">README</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- JS -->
+<script>
+// ── JSZip CDN for zip download ──────────────────────────────
+const JSZIP_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+
+// ── State ───────────────────────────────────────────────────
+const state = {
+  apiKey:      '',
+  browser:     'Safari',
+  apiUrl:      'https://hackatime.hackclub.com/api/hackatime/v1',
+  projectName: 'EasyEDA PCB Design',
+  installDir:  '~/tools/easyeda-tracker',
+};
+
+// ── Theme ───────────────────────────────────────────────────
+const themeBtn = document.getElementById('themeToggle');
+let dark = false;
+function setTheme(d) {
+  dark = d;
+  document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light');
+  themeBtn.textContent = d ? '☀️ Light' : '🌙 Dark';
+  localStorage.setItem('theme', d ? 'dark' : 'light');
+}
+themeBtn.addEventListener('click', () => setTheme(!dark));
+if (localStorage.getItem('theme') === 'dark' ||
+    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  setTheme(true);
+}
+
+// ── Reveal API key ──────────────────────────────────────────
+const apiKeyInput = document.getElementById('apiKey');
+const revealBtn   = document.getElementById('revealBtn');
+revealBtn.addEventListener('click', () => {
+  apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+});
+
+// ── Custom URL toggle ────────────────────────────────────────
+const apiUrlSel      = document.getElementById('apiUrl');
+const customUrlField = document.getElementById('customUrlField');
+const customUrlInput = document.getElementById('customUrl');
+apiUrlSel.addEventListener('change', () => {
+  if (apiUrlSel.value === 'custom') {
+    customUrlField.style.display = 'flex';
+    state.apiUrl = customUrlInput.value || '';
+  } else {
+    customUrlField.style.display = 'none';
+    state.apiUrl = apiUrlSel.value;
+  }
+  updateAll();
+});
+customUrlInput.addEventListener('input', () => {
+  state.apiUrl = customUrlInput.value;
+  updateAll();
+});
+
+// ── Input listeners ──────────────────────────────────────────
+function bind(id, key) {
+  document.getElementById(id).addEventListener('input', function() {
+    state[key] = this.value;
+    updateAll();
+  });
+}
+apiKeyInput.addEventListener('input', function() {
+  state.apiKey = this.value;
+  updateAll();
+  // Update terminal demo user hint
+  const u = this.value ? '••••' + this.value.slice(-4) : 'yourname';
+  document.getElementById('termUser').textContent = u;
+});
+bind('browser',     'browser');
+bind('projectName', 'projectName');
+bind('installDir',  'installDir');
+document.getElementById('browser').addEventListener('change', function() {
+  state.browser = this.value;
+  updateAll();
+});
+document.getElementById('projectName').addEventListener('input', function() {
+  document.getElementById('termProject').textContent = this.value || 'EasyEDA PCB Design';
+});
+
+// ── INI generator ─────────────────────────────────────────────
+function genIni() {
+  const key = state.apiKey || 'YOUR_HACKATIME_API_KEY';
+  const url = state.apiUrl || 'https://hackatime.hackclub.com/api/hackatime/v1';
+  const browser = state.browser || 'Safari';
+  const project = state.projectName || 'EasyEDA PCB Design';
+  return `[tracker]
+api_key          = ${key}
+api_url          = ${url}
+browser          = ${browser}
+default_project  = ${project}
+
+; Timing (seconds)
+poll_interval    = 5
+heartbeat_interval = 30
+idle_timeout     = 120
+dedup_window     = 30
+
+; Logging
+log_file         = ~/.easyeda_tracker.log
+log_level        = INFO
+
+; Network
+retry_max        = 5
+retry_base_delay = 2
+
+; Entity prefix used in heartbeat 'entity' field
+entity_prefix    = easyeda://`;
+}
+
+// ── INI syntax highlighter ────────────────────────────────────
+function highlightIni(raw) {
+  return raw.split('\n').map(line => {
+    if (line.startsWith('[')) {
+      return `<span class="ini-section">${esc(line)}</span>`;
+    }
+    if (line.startsWith(';') || line.startsWith('#')) {
+      return `<span class="ini-comment">${esc(line)}</span>`;
+    }
+    const eq = line.indexOf('=');
+    if (eq > -1) {
+      const k = line.slice(0, eq);
+      const v = line.slice(eq + 1);
+      return `<span class="ini-key">${esc(k)}</span>=<span class="ini-val">${esc(v)}</span>`;
+    }
+    return `<span class="ini-comment">${esc(line)}</span>`;
+  }).join('\n');
+}
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Steps ──────────────────────────────────────────────────────
+function getSteps() {
+  const dir    = state.installDir || '~/tools/easyeda-tracker';
+  const key    = state.apiKey || 'YOUR_API_KEY_HERE';
+  const script = `${dir}/easyeda_tracker.py`;
+
+  return [
+    {
+      title: 'Create the install folder',
+      desc:  'Run this once to create the directory.',
+      cmd:   `mkdir -p ${dir}`,
+    },
+    {
+      title: 'Move downloaded files into the folder',
+      desc:  'After downloading (Step 2), move all four files here. Or drag them in Finder.',
+      cmd:   `mv ~/Downloads/easyeda_tracker.py ~/Downloads/install.sh ~/Downloads/com.easyeda.tracker.plist.template ~/Downloads/README.md ${dir}/`,
+    },
+    {
+      title: 'Make the installer executable',
+      cmd:   `chmod +x ${dir}/install.sh`,
+    },
+    {
+      title: 'Run the installer',
+      desc:  'This installs pyobjc, writes your config, and registers the LaunchAgent.',
+      cmd:   `cd ${dir} && ./install.sh`,
+    },
+  ];
+}
+
+function getUsefulCmds() {
+  const dir = state.installDir || '~/tools/easyeda-tracker';
+  return [
+    { label: 'Check tracker is running', cmd: 'launchctl list | grep easyeda' },
+    { label: 'Stop the tracker',         cmd: 'launchctl unload ~/Library/LaunchAgents/com.easyeda.tracker.plist' },
+    { label: 'Start the tracker',        cmd: 'launchctl load ~/Library/LaunchAgents/com.easyeda.tracker.plist' },
+    { label: 'Restart',                  cmd: 'launchctl kickstart -k gui/$(id -u)/com.easyeda.tracker' },
+    { label: 'Run manually (debug)',      cmd: `python3 ${dir}/easyeda_tracker.py --debug` },
+    { label: 'Test connection',           cmd: `python3 ${dir}/easyeda_tracker.py --test-connection` },
+  ];
+}
+
+// ── Render steps ───────────────────────────────────────────────
+function renderSteps() {
+  const list = document.getElementById('stepsList');
+  const steps = getSteps();
+  list.innerHTML = steps.map((s, i) => `
+    <div class="step">
+      <div class="step-num">${i + 1}</div>
+      <div class="step-content">
+        <div class="step-title">${s.title}</div>
+        ${s.desc ? `<div class="step-desc">${s.desc}</div>` : ''}
+        <div class="cmd-block">
+          <span class="cmd-prompt">$</span>
+          <span class="cmd-text">${esc(s.cmd)}</span>
+          <button class="cmd-copy" data-cmd="${esc(s.cmd)}">copy</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  attachCopyListeners(list);
+}
+
+function renderUsefulCmds() {
+  const list = document.getElementById('usefulCmds');
+  const cmds = getUsefulCmds();
+  list.innerHTML = cmds.map(c => `
+    <div class="step">
+      <div class="step-num" style="border-radius:4px;font-size:10px;">→</div>
+      <div class="step-content">
+        <div class="step-title" style="font-size:13px;margin-bottom:6px;">${c.label}</div>
+        <div class="cmd-block">
+          <span class="cmd-prompt">$</span>
+          <span class="cmd-text">${esc(c.cmd)}</span>
+          <button class="cmd-copy" data-cmd="${esc(c.cmd)}">copy</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  attachCopyListeners(list);
+}
+
+function renderTestConn() {
+  const dir = state.installDir || '~/tools/easyeda-tracker';
+  const cmd = `python3 ${dir}/easyeda_tracker.py --test-connection`;
+  document.getElementById('testConnText').textContent = cmd;
+  const copyBtn = document.getElementById('testConnCopy');
+  copyBtn.dataset.cmd = cmd;
+}
+
+// ── Update all ─────────────────────────────────────────────────
+function updateAll() {
+  // INI
+  document.getElementById('iniPreview').innerHTML = highlightIni(genIni());
+  // Steps
+  renderSteps();
+  renderUsefulCmds();
+  renderTestConn();
+}
+
+// ── Copy helpers ───────────────────────────────────────────────
+function attachCopyListeners(root) {
+  root.querySelectorAll('.cmd-copy').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cmd = btn.dataset.cmd || btn.getAttribute('data-cmd');
+      navigator.clipboard.writeText(cmd).then(() => {
+        btn.textContent = 'copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1800);
+      });
+    });
+  });
+}
+attachCopyListeners(document);
+
+// INI copy button
+document.getElementById('copyIni').addEventListener('click', function() {
+  navigator.clipboard.writeText(genIni()).then(() => {
+    this.textContent = 'copied!';
+    this.classList.add('copied');
+    setTimeout(() => { this.textContent = 'copy'; this.classList.remove('copied'); }, 1800);
+  });
+});
+
+// ── Download all as ZIP ────────────────────────────────────────
+document.getElementById('dlAll').addEventListener('click', async () => {
+  const btn = document.getElementById('dlAll');
+  btn.textContent = 'Downloading…';
+  btn.disabled = true;
+
+  try {
+    // Load JSZip from CDN
+    if (!window.JSZip) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = JSZIP_CDN;
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    const files = [
+      'easyeda_tracker.py',
+      'install.sh',
+      'com.easyeda.tracker.plist.template',
+      'README.md',
+    ];
+
+    const zip = new JSZip();
+    const folder = zip.folder('easyeda-tracker');
+
+    await Promise.all(files.map(async name => {
+      const resp = await fetch(name);
+      const blob = await resp.blob();
+      folder.file(name, blob);
+    }));
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(content);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'easyeda-tracker.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    btn.innerHTML = '✓ Downloaded!';
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all files as a folder`;
+      btn.disabled = false;
+    }, 2500);
+  } catch (err) {
+    btn.innerHTML = '⚠ Download failed — use individual links above';
+    btn.disabled = false;
+    console.error(err);
+  }
+});
+
+// ── Terminal typewriter animation ──────────────────────────────
+function revealTermLines() {
+  const lines = ['termLine2','termLine3','termLine4','termLine5'];
+  lines.forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.style.opacity = '1';
+    }, 700 + i * 600);
+  });
+}
+// Trigger when hero is in view
+const heroObs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    revealTermLines();
+    heroObs.disconnect();
+  }
+}, { threshold: 0.3 });
+heroObs.observe(document.querySelector('.term-wrap'));
+
+// ── Init ────────────────────────────────────────────────────────
+updateAll();
+</script>
+
+</body>
+</html>
